@@ -16,9 +16,14 @@ git clone <repository_url>
 pip install unlzw numpy
 
 
-3. Run the cache simulator
+3. Make sure you have the right permissions for the run.sh file.
+   
+chmod +x run.sh
 
-python simulator.py
+4. Run the file to get the output for the 15 trace files.
+
+ ./run.sh     
+
 
 
 ## Usage

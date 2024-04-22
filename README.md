@@ -2,6 +2,9 @@
 
 This is a cache simulator written in Python that simulates the behavior of an L1 cache, L2 cache, and DRAM memory subsystem based on memory trace files.
 
+Here is a link to our report with more details: https://docs.google.com/document/d/1MnymevvOJSRQI9yqrvzd6Hs_3ozKfGV84ti3b6q9F4w/edit?usp=sharing
+
+
 ## Installation
 
 To run the cache simulator, follow these steps:

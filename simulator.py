@@ -318,7 +318,7 @@ def trace(trace_file):
         active_times.append(l1.l1_active_time + l2.l2_active_time + dram.active_time)
 
         dram_access.append(dram.dram_access_val)
-        dram_idle_energy.append(dram.IDLE_W * clock)
+        dram_idle_energy.append(dram.IDLE_W * (clock - dram.active_time))
         dram_dynamic_energy.append(dram.dynamic_energy) 
 
     total_energy = np.mean(np.array(l1_idle_energy) + np.array(l1_dynamic_energy) + np.array(l2_idle_energy) + np.array(l2_dynamic_energy) + np.array(dram_idle_energy) + np.array(dram_dynamic_energy))

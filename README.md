@@ -43,9 +43,17 @@ The cache simulator consists of three main components:
 
 3. **DRAM Memory**: Simulates the main memory subsystem. Memory accesses that miss in both the L1 and L2 caches result in accesses to the DRAM memory.
 
+
+## Output 
+
+Each trace file is individually processed, with metrics averaged over 10 simulation runs. By running the file, the following results for all 15 trace files will be displayed in the console. The mean total energy consumption of the system is calculated, considering contributions from the L1 cache, L2 cache, and DRAM. Additionally, the mean average total active time across all components indicates the duration of active processing during the simulation. 
+For the L1 cache, metrics in the output include the mean number of cache hits and misses, time active, number of accesses (hits + misses), and the hit-to-miss ratio. Both dynamic and idle energy consumptions for L1, as well as their totals, are also displayed in the results. The standard deviation for these metrics across the 10 simulations are also output.
+Similarly, the L2 cache metrics cover hit-and-miss counts, access counts, active time, hit-to-miss ratios, and dynamic/idle/total energy consumption. For all of these stats, mean and standard deviation across 10 runs are shown. The DRAM access metrics highlight the standard deviation and mean of the number of accesses to DRAM and the associated total energy consumption
+
+
 ## Results
 
-After running the cache simulator, you will receive output detailing the energy consumption and performance metrics of the simulated cache hierarchy.
+After running the cache simulator, you will receive an output detailing the energy consumption and performance metrics of the simulated cache hierarchy.
 
 ## Contributors
 

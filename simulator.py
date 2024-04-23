@@ -161,18 +161,11 @@ class l2_cache:
             self.DRAM.dram_read()
 
             # Find an empty line or evict a line
-            empty_line = next((line for line in self.cache[idx_bit] if line['tag'] is None), None)
-            if empty_line:
-                empty_line['tag'] = tag_bit
-                empty_line['dirty'] = True
-            else: 
-                evict_index = random.randint(0, self.associativity - 1)
-                evict_line = self.cache[idx_bit][evict_index]
-                if evict_line['dirty']:
-                    # Writebackto DRAM before updating cache
-                    self.DRAM.dram_write()
-                evict_line['tag'] = tag_bit 
-                evict_line['dirty'] = True
+            update_line = next((line for line in self.cache[idx_bit] if line['tag'] is None), None)
+            if update_line is None:
+                update_line = self.cache[idx_bit][random.randint(0, self.associativity - 1)]
+                if update_line['dirty']: self.DRAM.dram_write()
+            update_line.update({'tag': tag_bit,'dirty': True, 'address': address})
         return did_hit
 
     def write(self, address):
@@ -184,31 +177,27 @@ class l2_cache:
         idx_bit = int(format(address, '032b')[16:26], 2)
         self.l2_energy += self.L2_RW_TIME * self.L2_RW + self.L2_ENERGY_PENALTY
 
+        did_hit = False
         # Check if the data is in the cache
         for _, line in enumerate(self.cache[idx_bit]):
             if line['tag'] == tag_bit:
                 self.l2_hits += 1
                 line['dirty'] = True
-                return True
+                did_hit = True
+                break
+                
+        if not did_hit:
+            # Cache miss access data from next level in the memory hierarchy (DRAM)
+            self.l2_misses += 1
+            self.DRAM.dram_read()
 
-        # Cache miss access data from next level in the memory hierarchy (DRAM)
-        self.l2_misses += 1
-        self.DRAM.dram_read()
-
-        # Find an empty line or evict a line
-        empty_line = next((line for line in self.cache[idx_bit] if line['tag'] is None), None)
-        if empty_line:
-            empty_line['tag'] = tag_bit 
-            empty_line['dirty'] = True
-        else:
-            evict_index = random.randint(0, self.associativity - 1)
-            evict_line = self.cache[idx_bit][evict_index]
-            if evict_line['dirty']:
-                # Writeback to DRAM on eviction from L2 cache
-                self.DRAM.dram_write()
-            evict_line['tag'] = tag_bit 
-            evict_line['dirty'] = True
-        return False
+            # Find an empty line or evict a line
+            update_line = next((line for line in self.cache[idx_bit] if line['tag'] is None), None)
+            if update_line is None:
+                update_line = self.cache[idx_bit][random.randint(0, self.associativity - 1)]
+                if update_line['dirty']: self.DRAM.dram_write()
+            update_line.update({'tag': tag_bit,'dirty': True, 'address': address})
+        return did_hit
 
 class dram_mem:
 # Constants
@@ -238,7 +227,7 @@ class dram_mem:
 
 def trace(trace_file):
     BASE = 16 
-    
+    PROCESSOR_TIME = .5 * (10 ** -9) #processor runs at 2GHz (0.5nsec cycle) 
     #Used this to understand how to trace and unzip a file like this -> https://stackoverflow.com/questions/32921263/uncompressing-a-z-file-with-python 
     # Check if the trace file has a .Z extension
     if trace_file.endswith('.Z'):
@@ -282,10 +271,12 @@ def trace(trace_file):
         with open(trace_file, 'r') as f:
             for line in f:
                 # global active_time
-                active_time += .5 * (10 ** -9) #processor runs at 2GHz (0.5nsec cycle) 
-                parts = line.strip().split()
-                operation = parts[0]  # Extract the access type (0: read data, 1: write data, 2: read instruction)
-                address = int(parts[1], BASE) # Convert the hexadecimal address string to an integer
+                active_time += PROCESSOR_TIME  # Increment active time by processor time for each cycle
+                operation, hex_address, *extra = line.strip().split()  # Extract operation and hexadecimal address
+                # operation = int(operation)  # Convert operation to integer
+
+                # Convert the hexadecimal address string to an integer
+                address = int(hex_address, BASE)
 
                 #0 for memory 
                 if operation  == '0': 

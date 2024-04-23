@@ -312,9 +312,9 @@ def trace(trace_file):
         l2_access.append(l2.l2_access)
 
         l1_dynamic_energy.append(l1.l1_energy)
-        l1_idle_energy.append(l1.L1_IDLE * clock * 2)
+        l1_idle_energy.append(l1.L1_IDLE * (clock - l1.l1_active_time) * 2)
         l2_dynamic_energy.append(l2.l2_energy)
-        l2_idle_energy.append(l2.L2_IDLE * clock)
+        l2_idle_energy.append(l2.L2_IDLE * (clock - l2.l2_active_time))
         active_times.append(l1.l1_active_time + l2.l2_active_time + dram.active_time)
 
         dram_access.append(dram.dram_access_val)

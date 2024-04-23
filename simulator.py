@@ -214,7 +214,7 @@ class dram_mem:
 # Constants
     DRAM_PENALTY = 640 * (10 ** -12)  # Energy penalty for accessing the memory (in joules) convert from pJ to J 
     IDLE_W = 0.8  # Idle power consumption of the memory (in watts)
-    RW_W = 2  # Power consumption during read or write operations (in watts)
+    RW_W = 4  # Power consumption during read or write operations (in watts)
     ACTIVE = 45 * (10 ** -9)  # Time taken to access the memory (in ns) convert from nS to seconds 
     
     def __init__(self): 
@@ -272,7 +272,7 @@ def trace(trace_file):
     for _ in range(10):
         # Initialize components for each file
         dram = dram_mem()
-        l2 = l2_cache(4, dram)
+        l2 = l2_cache(4, dram) #change the first value for associativty 
         l1 = l1_cache(l2)
 
         # Reset active time for each run
